@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">GitHubUserApp</string>
+    <string name="github_s_user_app">Github\'s User App</string>
+    <string name="github_users">Github Users</string>
+    <string name="user_profile_image">User Profile Image</string>
+    <string name="users_full_name">User\'s Full Name</string>
+    <string name="username">Username</string>
+    <string name="user_full_name_value">\%s (\@%s)</string>
+    <string name="username_value">\@%s</string>
+    <string name="company_location_value">\%s (\%s)</string>
+    <string name="repositories_value">\%d Repositories</string>
+    <string name="followers_value">\%d Followers</string>
+    <string name="followings_value">\%d Followings</string>
+    <string name="dummy_repositories">99 repositories</string>
+    <string name="dummy_followers">99 Followers</string>
+    <string name="dummy_followings">99 Followings</string>
+    <string name="company_name">Company name</string>
+    <string name="detail_user">Detail User</string>
+    <string name="search">Search</string>
+    <string name="search_hint">Username</string>
+    <string name="followers">Followers</string>
+    <string name="following">Following</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="night_mode">Night Mode</string>
+    <string name="dark">Dark</string>
+    <string name="light">Light</string>
+
+</resources>
+
+

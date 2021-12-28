@@ -1,16 +1,19 @@
 package com.example.githubuserapp.viewModels
 
+import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.githubuserapp.models.DetailUserResponse
+import com.example.githubuserapp.models.FavUsers
 import com.example.githubuserapp.models.UsersResponseItem
+import com.example.githubuserapp.repository.FavUsersRepository
 import com.example.githubuserapp.services.ApiConfig
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class DetailUserViewModel(): ViewModel() {
+class DetailUserViewModel(application: Application): ViewModel() {
     val usersDetail: LiveData<DetailUserResponse>
         get() = _usersDetail
     val isSucceed: LiveData<Boolean>
@@ -102,6 +105,21 @@ class DetailUserViewModel(): ViewModel() {
 
             }
         )
+    }
+
+    private val mFavUsersRepository: FavUsersRepository = FavUsersRepository(application)
+
+    fun insert(favUsers: FavUsers) {
+        mFavUsersRepository.insert(favUsers)
+    }
+    fun update(favUsers: FavUsers) {
+        mFavUsersRepository.update(favUsers)
+    }
+    fun delete(favUsers: FavUsers) {
+        mFavUsersRepository.delete(favUsers)
+    }
+    fun getByUsername(username: String): LiveData<FavUsers> {
+       return mFavUsersRepository.getFavUsersByUsername(username)
     }
 
 

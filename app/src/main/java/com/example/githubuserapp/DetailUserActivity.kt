@@ -1,8 +1,7 @@
 package com.example.githubuserapp
 
-import android.content.ContentValues
+import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.StringRes
@@ -11,18 +10,17 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.githubuserapp.adapters.DetailUserPagerAdapter
 import com.example.githubuserapp.databinding.ActivityDetailUserBinding
-import com.example.githubuserapp.models.DatabaseContract
-import com.example.githubuserapp.models.DetailUserResponse
-import com.example.githubuserapp.models.FavUsersHelper
+import com.example.githubuserapp.models.FavUsers
 import com.example.githubuserapp.viewModels.DetailUserViewModel
+import com.example.githubuserapp.viewModels.FavUsersViewModelFactory
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
 class DetailUserActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailUserBinding
     private lateinit var detailUserViewModel: DetailUserViewModel
-    private lateinit var favUsersHelper: FavUsersHelper
-    private var detailUser: DetailUserResponse? = null
+    private var detailUser: FavUsers? = null
+    private var isAlreadyFavorite = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,10 +29,7 @@ class DetailUserActivity : AppCompatActivity() {
         setContentView(binding.root)
         supportActionBar?.title = resources.getString(R.string.detail_user)
 
-        favUsersHelper = FavUsersHelper.getInstance(applicationContext)
-        favUsersHelper.open()
-
-        detailUserViewModel = ViewModelProvider(this)[DetailUserViewModel::class.java]
+        detailUserViewModel = obtainViewModel(this@DetailUserActivity)
         val username = intent.getStringExtra(EXTRA_USERNAME)
         if (username != null) {
             showLoading(true)
@@ -50,7 +45,6 @@ class DetailUserActivity : AppCompatActivity() {
         }
         detailUserViewModel.usersDetail.observe(this, {
             if (it != null){
-
                 Glide
                     .with(this)
                     .load(it.avatarUrl)
@@ -68,45 +62,52 @@ class DetailUserActivity : AppCompatActivity() {
                 binding.tvFollowings.text = resources.getString(R.string.followings_value).format(it.following)
                 showLoading(false)
 
-                it.login?.let { it1 ->
-                    val test = favUsersHelper.queryByUsername(it1)
-                    Log.i("testxx", test.toString())
+                detailUser = FavUsers(
+                    githubId = detailUserViewModel.usersDetail.value?.id,
+                    avatarUrl = detailUserViewModel.usersDetail.value?.avatarUrl,
+                    login = detailUserViewModel.usersDetail.value?.login
+                )
 
-                }
-
-
+                detailUserViewModel.getByUsername(detailUser!!.login!!).observe(this, { it ->
+                    isAlreadyFavorite = if(it != null){
+                        binding.btnFavUser.setColorFilter(Color.RED)
+                        detailUser!!.id = it.id
+                        true
+                    }else{
+                        binding.btnFavUser.setColorFilter(Color.WHITE)
+                        false
+                    }
+                })
 
             }
-
         })
 
         detailUserViewModel.isSucceed.observe(this,{
             if(!it){
-                Toast.makeText(this, "Error Occurred", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error Occurred", Toast.LENGTH_LONG).show()
                 showLoading(false)
             }
         })
 
         binding.btnFavUser.setOnClickListener {
 
-//            val values = ContentValues()
-//            values.put(DatabaseContract.UserFavoriteColumns.LOGIN, detailUser?.login)
-//            values.put(DatabaseContract.UserFavoriteColumns.AVATAR_URL, detailUser?.avatarUrl)
-//            values.put(DatabaseContract.UserFavoriteColumns.ID, detailUser?.id)
-//
-//            val result = favUsersHelper.insert(values)
-//
-//            if (result > 0) {
-//                Toast.makeText(this, "Berhasil menambah data", Toast.LENGTH_SHORT).show()
-//            } else {
-//                Toast.makeText(this, "Gagal menambah data $result", Toast.LENGTH_SHORT).show()
-//            }
-            Toast.makeText(this, "clicked", Toast.LENGTH_SHORT).show()
-
+             if(isAlreadyFavorite){
+                 isAlreadyFavorite = false
+                 detailUserViewModel.delete(detailUser as FavUsers)
+                 binding.btnFavUser.setColorFilter(Color.WHITE)
+                 Toast.makeText(this, "Berhasil menghapus data", Toast.LENGTH_LONG).show()
+             } else {
+                 detailUserViewModel.insert(detailUser as FavUsers)
+                 Toast.makeText(this, "Berhasil menambah data", Toast.LENGTH_LONG).show()
+                 binding.btnFavUser.setColorFilter(Color.RED)
+                 isAlreadyFavorite = true
+             }
         }
+    }
 
-
-
+    private fun obtainViewModel(activity: AppCompatActivity): DetailUserViewModel {
+        val factory = FavUsersViewModelFactory.getInstance(activity.application)
+        return ViewModelProvider(activity, factory)[DetailUserViewModel::class.java]
     }
 
     private fun showLoading(isLoading: Boolean) {
@@ -117,6 +118,8 @@ class DetailUserActivity : AppCompatActivity() {
         }
     }
 
+
+
     companion object{
         const val EXTRA_USERNAME = "extra_username"
         @StringRes
@@ -124,15 +127,10 @@ class DetailUserActivity : AppCompatActivity() {
             R.string.followers,
             R.string.following
         )
-
-        const val RESULT_ADD = 101
-        const val RESULT_UPDATE = 201
-        const val RESULT_DELETE = 301
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        favUsersHelper.close()
     }
 
 

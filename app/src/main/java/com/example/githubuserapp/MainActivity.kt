@@ -5,9 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
+import android.widget.Button
 import android.widget.CompoundButton
 import android.widget.Toast
+import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
@@ -22,8 +25,9 @@ import com.example.githubuserapp.databinding.ActivityMainBinding
 import com.example.githubuserapp.helpers.data.SettingPreferences
 import com.example.githubuserapp.models.UsersResponseItem
 import com.example.githubuserapp.viewModels.MainViewModel
-import com.example.githubuserapp.viewModels.ViewModelFactory
-import kotlin.properties.Delegates
+import com.example.githubuserapp.viewModels.MainViewModelFactory
+
+
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -44,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         val pref = SettingPreferences.getInstance(dataStore)
         mainViewModel = ViewModelProvider(
             this,
-            ViewModelFactory(pref)
+            MainViewModelFactory(pref)
         )[MainViewModel::class.java]
 
         showLoading(true)
@@ -71,6 +75,8 @@ class MainActivity : AppCompatActivity() {
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 }
             })
+
+
 
     }
 
@@ -113,7 +119,20 @@ class MainActivity : AppCompatActivity() {
             nightModeSwitcher.isChecked = isChecked
         }
 
+
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val itemId = item.itemId
+
+        if(itemId == R.id.favorite){
+            val intent = Intent(this, UsersFavoriteActivity::class.java)
+            startActivity(intent)
+            return true
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     private fun showLoading(isLoading: Boolean) {

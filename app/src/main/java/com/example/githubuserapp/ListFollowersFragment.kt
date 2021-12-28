@@ -7,12 +7,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.githubuserapp.adapters.ListUsersAdapter
 import com.example.githubuserapp.databinding.FragmentListFollowersBinding
 import com.example.githubuserapp.models.UsersResponseItem
 import com.example.githubuserapp.viewModels.DetailUserViewModel
+import com.example.githubuserapp.viewModels.FavUsersViewModelFactory
 
 
 class ListFollowersFragment : Fragment() {
@@ -31,7 +33,7 @@ class ListFollowersFragment : Fragment() {
         arguments?.let {
             username = it.getString(EXTRA_USERNAME).toString()
         }
-        viewModel = ViewModelProvider(this)[DetailUserViewModel::class.java]
+        viewModel = obtainViewModel(activity as DetailUserActivity)
 
         showLoading(true)
         viewModel.getFollowers(username)
@@ -74,6 +76,11 @@ class ListFollowersFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+    }
+
+    private fun obtainViewModel(activity: AppCompatActivity): DetailUserViewModel {
+        val factory = FavUsersViewModelFactory.getInstance(activity.application)
+        return ViewModelProvider(activity, factory)[DetailUserViewModel::class.java]
     }
 
     companion object {

@@ -20,11 +20,12 @@
     <string name="search_hint">Username</string>
     <string name="followers">Followers</string>
     <string name="following">Following</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="night_mode">Night Mode</string>
     <string name="dark">Dark</string>
     <string name="light">Light</string>
+    <string name="favorite_users">Favorite Users</string>
+    <string name="you_do_not_have_user_favorite">Anda tidak memiliki user favorite</string>
 
 </resources>
 
